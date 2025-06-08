@@ -31,8 +31,13 @@ public class Reclamation extends BaseEntity implements Serializable {
 
     private String description;
 
+    @Column(nullable = false)
+    private Boolean validate = false;
+
+
     @OneToOne
     @JoinColumn(name = "commande_id")
     private Commande commande;
+
 
 }

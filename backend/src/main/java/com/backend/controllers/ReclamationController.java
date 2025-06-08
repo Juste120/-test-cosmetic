@@ -21,6 +21,8 @@ public class ReclamationController {
         this.reclamationService = reclamationService;
     }
 
+
+
     @PostMapping
     public ResponseEntity<?> createReclamation( @RequestBody ReclamationRequest reclamationRequest) {
         try {
@@ -83,6 +85,19 @@ public class ReclamationController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/{trackingId}/validate")
+    public ResponseEntity<?> validateReclamation(@PathVariable UUID trackingId) {
+        try {
+            ReclamationResponse response = reclamationService.validateReclamation(trackingId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Erreur: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur interne: " + e.getMessage());
         }
     }
 }

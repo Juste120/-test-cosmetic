@@ -26,8 +26,9 @@ public class ReclamationMapper {
         reclamation.setTrackingId(UUID.randomUUID());
         reclamation.setSujet(request.sujet());
         reclamation.setDescription(request.description());
+        reclamation.setValidate(false);
 
-        int numeroCommande = Integer.parseInt(request.numeroCommande());
+        int numeroCommande = Integer.parseInt(String.valueOf(request.numeroCommande()));
         reclamation.setCommande(
                 commandeRepository.findByNumeroCommande(numeroCommande)
                         .orElseThrow(() -> new IllegalArgumentException("Commande introuvable avec le numéro : " + numeroCommande))
@@ -46,7 +47,8 @@ public class ReclamationMapper {
                 reclamation.getTrackingId(),
                 String.valueOf(reclamation.getCommande().getNumeroCommande()),
                 reclamation.getSujet(),
-                reclamation.getDescription()
+                reclamation.getDescription(),
+                reclamation.getValidate()
         );
     }
 

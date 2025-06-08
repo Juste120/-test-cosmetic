@@ -6,5 +6,6 @@ public record ReclamationResponse(
         UUID trackingId,
         String numeroCommande,
         String sujet,
-        String description
+        String description,
+        Boolean validate
 ) {}

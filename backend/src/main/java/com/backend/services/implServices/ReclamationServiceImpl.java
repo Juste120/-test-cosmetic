@@ -89,10 +89,30 @@ public class ReclamationServiceImpl implements ReclamationService {
 
     @Override
     public List<ReclamationResponse> getReclamation() {
-        // CORRECTION: Utiliser findAll() au lieu de findAllByReclamation()
         return reclamationRepository.findAll()
                 .stream()
                 .map(reclamationMapper::toResponse)
                 .toList();
     }
+
+    @Override
+    public ReclamationResponse validateReclamation(UUID trackingId) {
+        if (trackingId == null) {
+            throw new IllegalArgumentException("Le trackingId ne peut pas être null");
+        }
+
+        Reclamation reclamation = reclamationRepository.findByTrackingId(trackingId)
+                .orElseThrow(() -> new IllegalArgumentException("Réclamation introuvable avec l'ID : " + trackingId));
+
+        // Vérifier si la réclamation n'est pas déjà validée
+        if (Boolean.TRUE.equals(reclamation.getValidate())) {
+            throw new IllegalArgumentException("Cette réclamation est déjà validée");
+        }
+
+        reclamation.setValidate(true);
+        Reclamation savedReclamation = reclamationRepository.save(reclamation);
+
+        return reclamationMapper.toResponse(savedReclamation);
+    }
+
 }

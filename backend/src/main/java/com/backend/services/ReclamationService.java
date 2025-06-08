@@ -12,5 +12,7 @@ public interface ReclamationService {
     ReclamationResponse updateReclammation(UUID trackingId, ReclamationRequest reclamationRequest);
     void deleteReclammation(UUID trackingId);
     List<ReclamationResponse> getReclamation();
+    ReclamationResponse validateReclamation(UUID trackingId);
+
 
 }

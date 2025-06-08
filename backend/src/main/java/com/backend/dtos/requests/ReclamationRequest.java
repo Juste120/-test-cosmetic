@@ -1,7 +1,7 @@
 package com.backend.dtos.requests;
 
 public record ReclamationRequest(
-        String numeroCommande,
+        int  numeroCommande,
         String sujet,
         String description
 ) {}
