@@ -1,10 +1,11 @@
-Module de Gestion des Retours et Réclamations
+📋 Module de Gestion des Retours et Réclamations
 Description
 Système web complet permettant aux clients de soumettre des réclamations ou des demandes de retour produit, et aux administrateurs de les traiter efficacement. Développé avec Angular 19 (frontend) intégrant le template Sakai et Spring Boot 3.5.0 (backend).
+
 Technologies Utilisées
 Backend
 
-Spring Boot 3.5.0 - Framework Java
+Spring Boot 3.5.0 - Framework Java principal
 Spring Data JPA - Accès aux données et ORM
 PostgreSQL - Base de données relationnelle
 Lombok - Réduction du code boilerplate
@@ -18,7 +19,8 @@ Template Sakai - Interface utilisateur moderne avec PrimeNG
 TypeScript - Langage de programmation
 PrimeNG - Composants UI avancés
 SweetAlert2 - Notifications et confirmations élégantes
-Node.js - Environnement d'exécution
+Node.js 18+ - Environnement d'exécution
+
 
 Prérequis
 Avant de lancer le projet, assurez-vous d'avoir installé :
@@ -28,6 +30,7 @@ npm (inclus avec Node.js)
 Java 21 (JDK)
 PostgreSQL (version 12 ou supérieure)
 Git
+
 
 Architecture du Système
 Entités Backend
@@ -44,11 +47,12 @@ Filtrage par statut (En attente, En traitement, Résolue, Rejetée)
 Notifications avec SweetAlert2
 Badges de statut colorés
 
+
 Configuration de la Base de Données
-
-Créez une base de données PostgreSQL nommée cosmetic_db
+1. Créer la base de données
+sqlCREATE DATABASE cosmetic_db;
+2. Configuration application.properties
 Configurez les paramètres dans backend/src/main/resources/application.properties :
-
 properties# Configuration PostgreSQL
 spring.datasource.url=jdbc:postgresql://localhost:5432/cosmetic_db
 spring.datasource.username=votre_username
@@ -63,6 +67,7 @@ spring.application.name=reclamations-management
 
 # Configuration CORS (pour Angular)
 spring.web.cors.allowed-origins=http://localhost:4200
+
 Instructions d'Exécution
 1. Lancement du Backend (Spring Boot)
 bash# Naviguer vers le dossier backend
@@ -89,7 +94,7 @@ cd frontend
 # Installer les dépendances
 npm install
 
-# Installer SweetAlert2 (si pas déjà inclus)
+# Installer SweetAlert2
 npm install sweetalert2 @types/sweetalert2
 
 # Lancer le serveur de développement
