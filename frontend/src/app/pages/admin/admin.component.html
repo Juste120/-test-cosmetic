@@ -1,0 +1,280 @@
+<!-- Toast Messages -->
+<p-toast></p-toast>
+
+<!-- Confirmation Dialog -->
+<p-confirmDialog
+  [style]="{width: '450px'}"
+  [baseZIndex]="10000"
+  rejectButtonStyleClass="p-button-text">
+</p-confirmDialog>
+
+<!-- Main Content -->
+<div class="min-h-screen bg-gray-50 p-4">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header Card -->
+    <p-card class="mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="pi pi-cog mr-3 text-gray-600"></i>
+            Administration des Réclamations
+          </h1>
+          <p class="text-gray-600">Gérez les réclamations client - Validation et traitement</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+            {{ reclamations.length }} réclamation(s)
+          </span>
+          <p-button
+            icon="pi pi-refresh"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="refreshData()"
+            [loading]="loading"
+            pTooltip="Actualiser les données"
+            tooltipPosition="bottom">
+          </p-button>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- Main Data Card -->
+    <p-card>
+      <!-- Toolbar -->
+      <p-toolbar class="mb-4 bg-gray-100 rounded-lg">
+        <div class="p-toolbar-group-start">
+          <span class="p-input-icon-left mr-4">
+            <i class="pi pi-search text-gray-600"></i>
+            <input
+              pInputText
+              type="text"
+              [(ngModel)]="searchValue"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="Rechercher..."
+              class="p-inputtext-sm" />
+          </span>
+
+          <p-dropdown
+            [options]="statuses"
+            [(ngModel)]="selectedStatus"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Filtrer par statut"
+            [showClear]="true"
+            class="ml-2"
+            styleClass="p-dropdown-sm">
+          </p-dropdown>
+        </div>
+
+        <div class="p-toolbar-group-end">
+          <p-button
+            icon="pi pi-times"
+            [outlined]="true"
+            severity="secondary"
+            (onClick)="clear(dt)"
+            pTooltip="Effacer les filtres"
+            class="p-button-sm">
+          </p-button>
+        </div>
+      </p-toolbar>
+
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="flex justify-center items-center py-8">
+        <p-progressSpinner strokeWidth="3" animationDuration="1s"></p-progressSpinner>
+      </div>
+
+      <!-- Data Table -->
+      <p-table
+        #dt
+        [value]="reclamations"
+        [paginator]="true"
+        [rows]="15"
+        [rowsPerPageOptions]="[10, 15, 25, 50]"
+        [globalFilterFields]="['numeroCommande', 'sujet', 'description']"
+        [loading]="loading"
+        styleClass="p-datatable-gridlines"
+        [scrollable]="true"
+        scrollHeight="700px"
+        [tableStyle]="{'min-width': '60rem'}"
+        *ngIf="!loading">
+
+        <!-- Table Header -->
+        <ng-template pTemplate="header">
+          <tr class="bg-gray-50">
+            <th class="text-left font-semibold text-gray-700 w-1/4">
+              <div class="flex items-center">
+                <i class="pi pi-shopping-cart mr-2 text-gray-500"></i>
+                N° Commande
+              </div>
+            </th>
+            <th class="text-left font-semibold text-gray-700 w-2/5">
+              <div class="flex items-center">
+                <i class="pi pi-tag mr-2 text-gray-500"></i>
+                Sujet
+              </div>
+            </th>
+            <th class="text-left font-semibold text-gray-700 w-1/6">
+              <div class="flex items-center">
+                <i class="pi pi-info-circle mr-2 text-gray-500"></i>
+                Statut
+              </div>
+            </th>
+            <th class="text-center font-semibold text-gray-700 w-1/5">
+              <div class="flex items-center justify-center">
+                <i class="pi pi-cog mr-2 text-gray-500"></i>
+                Actions
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+
+        <!-- Table Body -->
+        <ng-template pTemplate="body" let-reclamation>
+          <tr class="hover:bg-gray-50 transition-colors duration-200">
+            <td class="font-medium text-gray-800 py-4">
+              {{ reclamation.numeroCommande }}
+            </td>
+            <td class="text-gray-800 py-4">
+              <div class="max-w-md">
+                <p class="font-medium mb-1">{{ reclamation.sujet }}</p>
+                <p class="text-sm text-gray-600 truncate">{{ reclamation.description }}</p>
+              </div>
+            </td>
+            <td class="py-4">
+              <p-tag
+                [value]="getStatusLabel(reclamation.validate)"
+                [severity]="getStatusSeverity(reclamation.validate)"
+                class="font-medium">
+              </p-tag>
+            </td>
+            <td class="text-center py-4">
+              <div class="flex justify-center space-x-2">
+                <!-- Bouton Voir Détails -->
+                <p-button
+                  icon="pi pi-eye"
+                  [outlined]="true"
+                  severity="secondary"
+                  size="small"
+                  (onClick)="viewReclamationDetails(reclamation)"
+                  pTooltip="Voir les détails"
+                  tooltipPosition="top">
+                </p-button>
+
+                <!-- Bouton Valider -->
+                <p-button
+                  icon="pi pi-check"
+                  severity="success"
+                  size="small"
+                  (onClick)="validateReclamation(reclamation)"
+                  [disabled]="reclamation.validate"
+                  pTooltip="{{ reclamation.validate ? 'Déjà validée' : 'Valider la réclamation' }}"
+                  tooltipPosition="top">
+                </p-button>
+
+                <!-- Bouton Refuser/Supprimer -->
+                <p-button
+                  icon="pi pi-times"
+                  severity="danger"
+                  size="small"
+                  (onClick)="refuseReclamation(reclamation)"
+                  [disabled]="reclamation.validate"
+                  pTooltip="{{ reclamation.validate ? 'Impossible de supprimer une réclamation validée' : 'Refuser et supprimer' }}"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty State -->
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="text-center py-8">
+              <div class="flex flex-col items-center justify-center text-gray-500">
+                <i class="pi pi-inbox text-4xl mb-4 text-gray-400"></i>
+                <h3 class="text-lg font-medium mb-2">Aucune réclamation trouvée</h3>
+                <p class="text-sm">Il n'y a actuellement aucune réclamation à traiter.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+</div>
+
+<!-- Dialog de détails -->
+<p-dialog
+  header="Détails de la réclamation"
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{width: '600px'}"
+  [closable]="true"
+  [resizable]="true"
+  styleClass="p-dialog-maximized">
+
+  <div *ngIf="selectedReclamation" class="space-y-4">
+    <!-- Header Info -->
+    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold text-gray-800">
+          Réclamation #{{ selectedReclamation.trackingId }}
+        </h3>
+        <p-tag
+          [value]="getStatusLabel(selectedReclamation.validate)"
+          [severity]="getStatusSeverity(selectedReclamation.validate)">
+        </p-tag>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="font-medium text-gray-600">N° de commande:</span>
+          <span class="ml-2 text-gray-800">{{ selectedReclamation.numeroCommande }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sujet -->
+    <div class="bg-white p-4 rounded-lg border border-gray-200">
+      <h4 class="font-semibold text-gray-700 mb-2 flex items-center">
+        <i class="pi pi-tag mr-2 text-gray-500"></i>
+        Sujet
+      </h4>
+      <p class="text-gray-800 font-medium">{{ selectedReclamation.sujet }}</p>
+    </div>
+
+    <!-- Description -->
+    <div class="bg-white p-4 rounded-lg border border-gray-200">
+      <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+        <i class="pi pi-file-text mr-2 text-gray-500"></i>
+        Description détaillée
+      </h4>
+      <p-scrollPanel [style]="{width: '100%', height: '200px'}" styleClass="bg-gray-50 rounded">
+        <div class="p-3">
+          <p class="text-gray-800 leading-relaxed whitespace-pre-wrap">{{ selectedReclamation.description }}</p>
+        </div>
+      </p-scrollPanel>
+    </div>
+
+    <!-- Actions dans le dialog -->
+    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+      <p-button
+        label="Valider"
+        icon="pi pi-check"
+        severity="success"
+        (onClick)="validateReclamation(selectedReclamation!); displayDialog = false"
+        [disabled]="selectedReclamation.validate">
+      </p-button>
+
+      <p-button
+        label="Refuser"
+        icon="pi pi-times"
+        severity="danger"
+        [outlined]="true"
+        (onClick)="refuseReclamation(selectedReclamation!); displayDialog = false"
+        [disabled]="selectedReclamation.validate">
+      </p-button>
+    </div>
+  </div>
+</p-dialog>

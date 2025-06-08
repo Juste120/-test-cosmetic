@@ -1,0 +1,166 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Toast pour les messages -->
+    <p-toast position="top-right"></p-toast>
+
+    <!-- Carte principale -->
+    <p-card class="shadow-sm border-0">
+      <ng-template pTemplate="header">
+        <div class="bg-white border-b border-gray-100 px-6 py-8">
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-50 rounded-full mb-4">
+              <i class="pi pi-file-edit text-blue-600 text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-900 mb-2">
+              @if (isEditMode) {
+                Modifier la réclamation
+              } @else {
+                Nouvelle réclamation
+              }
+            </h2>
+            <p class="text-gray-600 text-sm max-w-md mx-auto">
+              @if (isEditMode) {
+                Modifiez les informations de votre réclamation ci-dessous
+              } @else {
+                Remplissez le formulaire pour créer votre réclamation
+              }
+            </p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="content">
+        <!-- Spinner de chargement -->
+        @if (isLoading) {
+          <div class="flex justify-center items-center py-12">
+            <p-progressSpinner
+              strokeWidth="4"
+              animationDuration="1s"
+              styleClass="w-8 h-8">
+            </p-progressSpinner>
+          </div>
+        }
+
+        <!-- Formulaire -->
+        <form [formGroup]="reclamationForm" class="space-y-6 p-6" [class.opacity-50]="isLoading">
+          <!-- Numéro de commande -->
+          <div class="space-y-2">
+            <label for="numeroCommande" class="block text-sm font-medium text-gray-900">
+              Numéro de commande
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              id="numeroCommande"
+              type="text"
+              pInputText
+              formControlName="numeroCommande"
+              placeholder="Ex: CMD-2024-001"
+              [class.p-invalid]="hasError('numeroCommande')"
+              class="w-full"
+              [disabled]="isLoading">
+
+            @if (hasError('numeroCommande')) {
+              <small class="p-error block">
+                {{ getErrorMessage('numeroCommande') }}
+              </small>
+            }
+          </div>
+
+          <!-- Sujet -->
+          <div class="space-y-2">
+            <label for="sujet" class="block text-sm font-medium text-gray-900">
+              Sujet de la réclamation
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <input
+              id="sujet"
+              type="text"
+              pInputText
+              formControlName="sujet"
+              placeholder="Résumez votre problème en quelques mots"
+              [class.p-invalid]="hasError('sujet')"
+              class="w-full"
+              [disabled]="isLoading">
+
+            @if (hasError('sujet')) {
+              <small class="p-error block">
+                {{ getErrorMessage('sujet') }}
+              </small>
+            }
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-2">
+            <label for="description" class="block text-sm font-medium text-gray-900">
+              Description détaillée
+              <span class="text-red-500 ml-1">*</span>
+            </label>
+            <textarea
+              id="description"
+              pInputTextarea
+              formControlName="description"
+              placeholder="Décrivez votre problème en détail pour nous aider à mieux vous assister..."
+              rows="5"
+              [class.p-invalid]="hasError('description')"
+              class="w-full resize-none"
+              [disabled]="isLoading">
+            </textarea>
+
+            @if (hasError('description')) {
+              <small class="p-error block">
+                {{ getErrorMessage('description') }}
+              </small>
+            }
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex gap-3 pt-6 border-t border-gray-100">
+            <!-- Bouton Créer/Modifier -->
+            @if (!isEditMode) {
+              <p-button
+                (onClick)="createReclamation()"
+                [disabled]="isLoading"
+                severity="success"
+                icon="pi pi-plus"
+                label="Créer la réclamation"
+                styleClass="flex-1">
+              </p-button>
+            }
+
+            @if (isEditMode) {
+              <p-button
+                (onClick)="updateReclamation()"
+                [disabled]="isLoading"
+                severity="info"
+                icon="pi pi-check"
+                label="Modifier la réclamation"
+                styleClass="flex-1">
+              </p-button>
+            }
+
+            <!-- Bouton Annuler (en mode édition) -->
+            @if (isEditMode) {
+              <p-button
+                (onClick)="cancelEdit()"
+                [disabled]="isLoading"
+                severity="secondary"
+                outlined="true"
+                icon="pi pi-times"
+                label="Annuler">
+              </p-button>
+            }
+          </div>
+        </form>
+      </ng-template>
+
+      <ng-template pTemplate="footer">
+        <div class="bg-gray-50 px-6 py-4 text-center">
+          <div class="flex items-center justify-center text-sm text-gray-500">
+            <i class="pi pi-info-circle mr-2 text-blue-500"></i>
+            Tous les champs marqués d'un astérisque (*) sont obligatoires
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>
