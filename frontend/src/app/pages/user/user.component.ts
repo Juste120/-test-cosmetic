@@ -32,6 +32,7 @@ import {ReclamationResponse} from '../models/ReclamationResponse.model';
 })
 export class UserComponent implements OnInit {
   reclamationForm: FormGroup;
+  searchForm: FormGroup;
   isLoading = false;
   isEditMode = false;
   editingTrackingId = '';
@@ -45,6 +46,11 @@ export class UserComponent implements OnInit {
       numeroCommande: ['', [Validators.required, Validators.minLength(1)]],
       sujet: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]]
+    });
+
+    // Ajout du formulaire de recherche
+    this.searchForm = this.fb.group({
+      trackingId: ['', [Validators.required]]
     });
   }
 
@@ -174,6 +180,7 @@ export class UserComponent implements OnInit {
   // Réinitialiser le formulaire
   private resetForm(): void {
     this.reclamationForm.reset();
+    this.searchForm.reset(); // Ajout pour réinitialiser aussi le formulaire de recherche
     this.isEditMode = false;
     this.editingTrackingId = '';
     this.markFormGroupUntouched();
@@ -216,5 +223,20 @@ export class UserComponent implements OnInit {
 
   editReclamation(trackingId: string): void {
     this.loadReclamationForEdit(trackingId);
+  }
+
+  // Ajout de la méthode pour rechercher depuis le formulaire
+  searchReclamation(): void {
+    if (this.searchForm.valid) {
+      const trackingId = this.searchForm.get('trackingId')?.value;
+      this.editReclamation(trackingId);
+    } else {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Attention',
+        detail: 'Veuillez saisir un ID de tracking',
+        life: 3000
+      });
+    }
   }
 }
